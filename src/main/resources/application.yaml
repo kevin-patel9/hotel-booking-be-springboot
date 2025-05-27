@@ -1,0 +1,11 @@
+spring:
+    application:
+            name: hotel-booking
+    jpa:
+      show-sql: true
+    datasource:
+      url: ${DB_URL}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+    jwt:
+      secretKey: ${JWT_SECRET}
