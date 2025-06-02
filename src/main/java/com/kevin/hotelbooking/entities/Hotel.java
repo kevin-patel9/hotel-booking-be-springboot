@@ -1,13 +1,13 @@
 package com.kevin.hotelbooking.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,9 +15,12 @@ import java.util.Set;
 @Table(name = "hotels")
 public class Hotel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private String id;
+    private UUID id;
+
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "type")
     private String type;
@@ -44,8 +47,10 @@ public class Hotel {
     private Boolean featured;
 
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-    private Set<HotelImage> hotelImages = new LinkedHashSet<>();
+    @JsonManagedReference
+    private Set<HotelImage> photo = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Room> rooms = new LinkedHashSet<>();
 }

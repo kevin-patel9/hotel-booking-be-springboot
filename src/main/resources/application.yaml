@@ -9,3 +9,5 @@ spring:
       password: ${DB_PASSWORD}
     jwt:
       secretKey: ${JWT_SECRET}
+    frontend:
+      url: http://localhost:3000

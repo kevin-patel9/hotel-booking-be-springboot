@@ -14,7 +14,8 @@ CREATE TABLE users (
 
 -- HOTELS TABLE
 CREATE TABLE hotels (
-    id       VARCHAR(100) DEFAULT (UUID()) NOT NULL PRIMARY KEY,
+    id        BINARY(16) DEFAULT (uuid_to_bin(UUID())) NOT NULL PRIMARY KEY,
+    name     VARCHAR(40) NOT NULL,
     type     VARCHAR(100) NOT NULL,
     city     VARCHAR(100) NOT NULL,
     address  LONGTEXT NOT NULL,
@@ -27,44 +28,35 @@ CREATE TABLE hotels (
 
 -- ROOMS TABLE
 CREATE TABLE rooms (
-    id         VARCHAR(100) DEFAULT (UUID()) NOT NULL PRIMARY KEY,
+    id         BINARY(16) DEFAULT (uuid_to_bin(UUID())) NOT NULL PRIMARY KEY,
     title      VARCHAR(120) NOT NULL,
     price      DECIMAL(10, 2) NOT NULL,
     max_people TINYINT NOT NULL,
     `desc`     LONGTEXT NOT NULL,
-    hotel_id   VARCHAR(100) NOT NULL,
+    hotel_id   BINARY(16) NOT NULL,
     FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE
 );
 
 -- HOTEL IMAGES TABLE
 CREATE TABLE hotel_images (
     id        INT AUTO_INCREMENT PRIMARY KEY,
-    hotel_id  VARCHAR(100) NOT NULL,
+    hotel_id  BINARY(16) NOT NULL,
     img_url   VARCHAR(255) NOT NULL,
     FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE
-);
-
--- HOTEL ROOMS LINK TABLE (many-to-many)
-CREATE TABLE hotel_rooms (
-     id        INT AUTO_INCREMENT PRIMARY KEY,
-     hotel_id  VARCHAR(100) NOT NULL,
-     room_id   VARCHAR(100) NOT NULL,
-     FOREIGN KEY (hotel_id) REFERENCES hotels(id) ON DELETE CASCADE,
-     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 );
 
 -- ROOM NUMBERS TABLE
 CREATE TABLE room_numbers (
     id        INT AUTO_INCREMENT PRIMARY KEY,
-    room_id   VARCHAR(100) NOT NULL,
+    room_id   BINARY(16) NOT NULL,
     number    INT NOT NULL,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 );
 
 CREATE TABLE booked_rooms (
-    id             INT AUTO_INCREMENT PRIMARY KEY,
-    room_id INT NOT NULL,
-    booked_date    DATE NOT NULL,
-    FOREIGN KEY (room_id) REFERENCES room_numbers(id) ON DELETE CASCADE
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    room_number_id       INT NOT NULL,
+    booked_date   DATE NOT NULL,
+    FOREIGN KEY (room_number_id) REFERENCES room_numbers(id) ON DELETE CASCADE
 );
 

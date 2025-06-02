@@ -1,6 +1,7 @@
 package com.kevin.hotelbooking.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
@@ -18,10 +19,11 @@ public class BookedRoom {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private RoomNumber room;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_number_id")
+    private RoomNumber roomNumber;
 
-    @Column(name = "booked_date", updatable = false, insertable = false)
+    @Column(name = "booked_date")
     private LocalDate bookedDate;
+
 }

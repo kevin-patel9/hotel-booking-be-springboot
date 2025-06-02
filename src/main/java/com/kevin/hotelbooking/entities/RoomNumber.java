@@ -1,13 +1,11 @@
 package com.kevin.hotelbooking.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,12 +19,9 @@ public class RoomNumber {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
+    @JsonBackReference
     private Room room;
 
     @Column(name = "number")
     private Integer number;
-
-    @OneToMany(mappedBy = "room")
-    private Set<BookedRoom> bookedRooms = new LinkedHashSet<>();
-
 }
