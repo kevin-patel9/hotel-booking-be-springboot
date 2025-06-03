@@ -2,6 +2,7 @@ package com.kevin.hotelbooking.controller;
 
 import com.kevin.hotelbooking.dtos.HotelCreateRequestDto;
 import com.kevin.hotelbooking.dtos.HotelTypeCountDto;
+import com.kevin.hotelbooking.dtos.HotelUpdateRequestDto;
 import com.kevin.hotelbooking.entities.Hotel;
 import com.kevin.hotelbooking.mapper.HotelMapper;
 import com.kevin.hotelbooking.repository.HotelRepository;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -56,7 +58,7 @@ public class HotelController {
 
         if (hotels.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Map.of("message", "No hotel available.")
+                    Map.of("message", "No hotel available for the following city")
             );
 
         return ResponseEntity.ok(hotels);
@@ -85,8 +87,7 @@ public class HotelController {
         if (hotel.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     Map.of(
-                            "message", "hotel not found",
-                            "status", "false"
+                            "message", "hotel not found"
                     )
             );
         }
@@ -102,5 +103,44 @@ public class HotelController {
         var allRoom = roomRepository.findByHotelId(hotelId);
 
         return ResponseEntity.ok(allRoom);
+    }
+
+    @PutMapping("/updateHotel")
+    public ResponseEntity<?> updateHotelDetails(
+            @RequestBody HotelUpdateRequestDto request
+    ) {
+
+        var hotelToUpdate = hotelRepository.findById(request.getHotelId()).orElse(null);
+
+        if (hotelToUpdate == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("message", "hotel not found")
+            );
+        }
+
+        var hotel = hotelMapper.updateHotelFromDto(request, hotelToUpdate);
+
+        hotelRepository.save(hotel);
+
+        return ResponseEntity.ok(
+                Map.of("message", "Hotel updated")
+        );
+    }
+
+    @DeleteMapping("/deleteHotel/{hotelId}")
+    public ResponseEntity<Map<String, String>> deleteHotel(
+            @PathVariable UUID hotelId
+    ){
+        var hotel = hotelRepository.findById(hotelId).orElse(null);
+
+        if (hotel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("message", "hotel not found")
+            );
+        }
+
+        hotelRepository.delete(hotel);
+
+        return ResponseEntity.ok(Map.of("message", "Hotel deleted"));
     }
 }

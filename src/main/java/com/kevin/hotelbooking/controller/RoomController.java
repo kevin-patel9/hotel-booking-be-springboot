@@ -37,9 +37,7 @@ public class RoomController {
 
     @GetMapping
     public ResponseEntity<List<Room>> findAll() {
-
         var allRoom = roomRepository.findAll();
-
         return ResponseEntity.ok(allRoom);
     }
 
@@ -84,7 +82,7 @@ public class RoomController {
         );
     }
 
-    @PostMapping("/createBooking")
+    @PostMapping("/availability")
     public ResponseEntity<?> createdBookingForRoom(
             @RequestBody BookingCreateDto request
             ) {

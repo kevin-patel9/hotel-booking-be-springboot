@@ -1,5 +1,6 @@
 package com.kevin.hotelbooking.controller;
 
+import com.kevin.hotelbooking.dtos.UserDetailUpdateDto;
 import com.kevin.hotelbooking.dtos.UserLoginRequest;
 import com.kevin.hotelbooking.dtos.UserRequest;
 import com.kevin.hotelbooking.entities.User;
@@ -10,16 +11,17 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
@@ -75,5 +77,63 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message", "Logged successfully"));
 
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        var users = userRepository.findAll();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
+        var users = userRepository.findByEmail(email).orElse(null);
+
+        if (users == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("message", "User with given email does not exist")
+            );
+        }
+
+        return ResponseEntity.ok(users);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateUser(
+            @Valid @RequestBody UserDetailUpdateDto request
+    ){
+
+        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("message", "User with this email does not exist")
+            );
+        }
+
+        User user = optionalUser.get();
+
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
+        if (request.getCountry() != null) {
+            user.setCountry(request.getCountry());
+        }
+        if (request.getCity() != null) {
+            user.setCity(request.getCity());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "User updated successfully"));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException (){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of("message", "Invalid email or password")
+        );
     }
 }
