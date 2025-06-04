@@ -2,6 +2,7 @@ package com.kevin.hotelbooking.controller;
 
 import com.kevin.hotelbooking.dtos.UserDetailUpdateDto;
 import com.kevin.hotelbooking.dtos.UserLoginRequest;
+import com.kevin.hotelbooking.dtos.UserRegisterResponseDto;
 import com.kevin.hotelbooking.dtos.UserRequest;
 import com.kevin.hotelbooking.entities.User;
 import com.kevin.hotelbooking.mapper.UserMapper;
@@ -75,14 +76,8 @@ public class AuthController {
         cookie.setMaxAge(3600);
         response.addCookie(cookie);
 
-        return ResponseEntity.ok(Map.of("message", "Logged successfully"));
+        return ResponseEntity.ok(new UserRegisterResponseDto(user.getUsername(), user.getEmail(), user.getIsAdmin()));
 
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        var users = userRepository.findAll();
-        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{email}")

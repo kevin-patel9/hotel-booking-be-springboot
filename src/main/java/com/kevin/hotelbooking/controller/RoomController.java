@@ -5,6 +5,7 @@ import com.kevin.hotelbooking.dtos.RoomCreateRequestDto;
 import com.kevin.hotelbooking.dtos.RoomNumberRequestDto;
 import com.kevin.hotelbooking.entities.BookedRoom;
 import com.kevin.hotelbooking.entities.Room;
+import com.kevin.hotelbooking.entities.RoomNumber;
 import com.kevin.hotelbooking.mapper.RoomMapper;
 import com.kevin.hotelbooking.mapper.RoomNumberMapper;
 import com.kevin.hotelbooking.repository.BookedRoomRepository;
@@ -13,12 +14,10 @@ import com.kevin.hotelbooking.repository.RoomNumberRepository;
 import com.kevin.hotelbooking.repository.RoomRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -72,10 +71,13 @@ public class RoomController {
             );
         }
 
-        var roomNumberDetail = roomNumberMapper.toRoomDto(request);
-        roomNumberDetail.setRoom(room);
+        request.getRoomNumbers().forEach(roomNumber -> {
+            var newRoomNumberDetail = new RoomNumber();
+            newRoomNumberDetail.setNumber(roomNumber);
+            newRoomNumberDetail.setRoom(room);
 
-        roomNumberRepository.save(roomNumberDetail);
+            roomNumberRepository.save(newRoomNumberDetail);
+        });
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of("message", "Room number created")

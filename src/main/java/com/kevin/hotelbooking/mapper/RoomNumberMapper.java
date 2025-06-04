@@ -7,7 +7,4 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface RoomNumberMapper {
-
-    @Mapping(target = "number", source = "roomNumber")
-    RoomNumber toRoomDto(RoomNumberRequestDto roomNumberRequestDto);
 }

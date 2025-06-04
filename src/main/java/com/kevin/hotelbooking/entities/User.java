@@ -33,7 +33,7 @@ public class User {
     private String password;
 
     @Column(name = "is_admin")
-    private Boolean isAdmin;
+    private Byte isAdmin;
 
     @Column(name = "img")
     private String img;

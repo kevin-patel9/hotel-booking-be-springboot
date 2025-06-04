@@ -48,7 +48,7 @@ public class HotelController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/filterHotel")
     public ResponseEntity<?> getHotelDetails(
             @RequestParam(defaultValue = "1") BigDecimal min,
             @RequestParam(defaultValue = "999") BigDecimal max,
@@ -60,6 +60,16 @@ public class HotelController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     Map.of("message", "No hotel available for the following city")
             );
+
+        return ResponseEntity.ok(hotels);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllHotels() {
+        List<Hotel> hotels = hotelRepository.findAll();
+
+        if (hotels.isEmpty())
+            return ResponseEntity.status(HttpStatus.OK).body(List.of());
 
         return ResponseEntity.ok(hotels);
     }
