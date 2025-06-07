@@ -4,4 +4,4 @@ spring:
     jwt:
       secretKey: ${JWT_SECRET}
     profiles:
-      active: ${SPRING_PROFILE_ACTIVE}
+      active: dev
