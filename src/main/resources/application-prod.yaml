@@ -1,6 +1,4 @@
 spring:
-  jpa:
-    show-sql: true
   datasource:
     url: ${DB_URL}
   frontend:
