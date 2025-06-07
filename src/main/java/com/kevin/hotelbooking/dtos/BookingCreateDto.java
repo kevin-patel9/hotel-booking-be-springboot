@@ -8,6 +8,8 @@ import java.util.UUID;
 
 @Data
 public class BookingCreateDto {
-    private Integer roomNumber;
-    private List<LocalDate> dates;
+    private UUID roomId;
+    private List<Integer> roomNumber;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

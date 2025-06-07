@@ -1,10 +1,10 @@
 package com.kevin.hotelbooking.controller;
 
-import com.kevin.hotelbooking.dtos.HotelCreateRequestDto;
-import com.kevin.hotelbooking.dtos.HotelTypeCountDto;
-import com.kevin.hotelbooking.dtos.HotelUpdateRequestDto;
+import com.kevin.hotelbooking.dtos.*;
+import com.kevin.hotelbooking.entities.BookedRoom;
 import com.kevin.hotelbooking.entities.Hotel;
 import com.kevin.hotelbooking.mapper.HotelMapper;
+import com.kevin.hotelbooking.repository.BookedRoomRepository;
 import com.kevin.hotelbooking.repository.HotelRepository;
 import com.kevin.hotelbooking.repository.RoomRepository;
 import jakarta.validation.Valid;
@@ -15,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ public class HotelController {
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
     private final HotelMapper hotelMapper;
+    private final BookedRoomRepository bookedRoomRepository;
 
     @GetMapping("/cityCount")
     public List<Integer> getCityCount(@RequestParam(required = false, name = "cities") String cities) {
@@ -106,14 +108,37 @@ public class HotelController {
     }
 
     @GetMapping("/room/{hotelId}")
-    public ResponseEntity<?> getAllRoomsByHotelId(
-            @PathVariable UUID hotelId
-    ) {
+    public ResponseEntity<?> getAllRoomsByHotelId(@PathVariable UUID hotelId) {
+        var rooms = roomRepository.findByHotelId(hotelId);
 
-        var allRoom = roomRepository.findByHotelId(hotelId);
+        List<RoomWithBookingsDto> response = rooms.stream().map(room -> {
+            List<RoomNumberWithBookingsDto> roomNumberDtos = room.getRoomNumbers().stream().map(roomNumber -> {
+                List<LocalDate> bookedDates = bookedRoomRepository
+                        .findAllByRoomNumberId(roomNumber.getId())
+                        .stream()
+                        .map(BookedRoom::getBookedDate)
+                        .collect(Collectors.toList());
 
-        return ResponseEntity.ok(allRoom);
+                return new RoomNumberWithBookingsDto(
+                        roomNumber.getId(),
+                        roomNumber.getNumber(),
+                        bookedDates
+                );
+            }).collect(Collectors.toList());
+
+            return new RoomWithBookingsDto(
+                    room.getId(),
+                    room.getTitle(),
+                    room.getPrice(),
+                    room.getMaxPeople(),
+                    room.getDesc(),
+                    roomNumberDtos
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PutMapping("/updateHotel")
     public ResponseEntity<?> updateHotelDetails(
