@@ -3,3 +3,4 @@ spring:
     url: ${DB_URL}
   frontend:
     url: ${FRONT_END_ENDPOINT}
+    admin: ${ADMIN_ENDPOINT}
